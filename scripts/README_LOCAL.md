@@ -1,8 +1,6 @@
 # Local Judge / 本地判题
 
-**[English](#local-judge-english) · [中文](#本地判题中文)**
-
-<a name="local-judge-english"></a>
+**[English](#local-judge-english) · [中文**](#本地判题中文)
 
 ## Local Judge (English)
 
@@ -15,11 +13,15 @@ Supported languages: **cuda / triton / pytorch**.
 
 ## Contents
 
-| File | Purpose |
-| --- | --- |
+
+| File              | Purpose                                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
 | `local_runner.py` | The judge. Loads a `challenge.py`, runs your solution, compares against the reference, and times it. |
-| `judge.sh` | Launcher. Activates the venv, puts `nvcc` on `PATH`, then calls `local_runner.py`. |
-| `new_solution.sh` | Scaffolds a `solution/` file for a challenge/language from its starter template. |
+| `judge.sh`        | Launcher. Activates the venv, puts `nvcc` on `PATH`, then calls `local_runner.py`.                   |
+| `new_solution.sh` | Scaffolds a `solution/` file for a challenge/language from its starter template.                     |
+
+
+
 
 ## One-time setup
 
@@ -43,7 +45,11 @@ python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_
 # expected: True (12, 0)
 ```
 
+
+
 ## Usage
+
+
 
 ### Option A — launcher script (recommended; handles venv + nvcc PATH)
 
@@ -61,6 +67,8 @@ scripts/new_solution.sh challenges/easy/1_vector_add triton
 # -> creates solution/solution.py; implement solve() then run judge.sh
 ```
 
+
+
 ### Option B — call Python directly
 
 ```bash
@@ -74,11 +82,13 @@ Useful flags: `--solution <path>` (explicit solution file), `--arch <sm_xx>`
 
 ## Solution file convention
 
-| Language | Path | Entry point |
-| --- | --- | --- |
-| cuda | `<challenge>/solution/solution.cu` | `extern "C" void solve(...)` |
-| triton | `<challenge>/solution/solution.py` | `def solve(...)` |
-| pytorch | `<challenge>/solution/solution.pytorch.py` | `def solve(...)` |
+
+| Language | Path                                       | Entry point                  |
+| -------- | ------------------------------------------ | ---------------------------- |
+| cuda     | `<challenge>/solution/solution.cu`         | `extern "C" void solve(...)` |
+| triton   | `<challenge>/solution/solution.py`         | `def solve(...)`             |
+| pytorch  | `<challenge>/solution/solution.pytorch.py` | `def solve(...)`             |
+
 
 Or pass any path with `--solution`. `solution/` is git-ignored, so your solutions
 are never committed by accident.
@@ -86,34 +96,38 @@ are never committed by accident.
 ## Actions
 
 - `test` — run every case from `generate_functional_test()`, comparing against the
-  reference with the challenge's `atol` / `rtol`.
+reference with the challenge's `atol` / `rtol`.
 - `perf` — run the large `generate_performance_test()` case: verify correctness,
-  then time it (mean over 50 iterations).
+then time it (mean over 50 iterations).
 - `all` — both of the above.
+
+
 
 ## How it works
 
 - **pytorch / triton**: import the solution's `solve()` and call it with the test
-  tensors, passed **positionally** in `get_solve_signature()` order (Triton's `solve`
-  often uses lowercase parameter names, so positional — not keyword — args are used).
-  The output tensors are then compared with those produced by `reference_impl`.
+tensors, passed **positionally** in `get_solve_signature()` order (Triton's `solve`
+often uses lowercase parameter names, so positional — not keyword — args are used).
+The output tensors are then compared with those produced by `reference_impl`.
 - **cuda**: compile with `nvcc -shared -Xcompiler -fPIC -arch=sm_120` into a `.so`,
-  load it via `ctypes`, and call `solve`. Tensors are passed as device pointers
-  (`tensor.data_ptr()`); scalars are passed by their declared `ctype`.
+load it via `ctypes`, and call `solve`. Tensors are passed as device pointers
+(`tensor.data_ptr()`); scalars are passed by their declared `ctype`.
+
+
 
 ## Notes
 
 - Each challenge's `generate_performance_test()` is sized for the online Tesla T4
-  (16 GB); this machine's 24 GB is more forgiving. Correctness thresholds use the
-  challenge's own `atol` / `rtol`, matching the online judge.
+(16 GB); this machine's 24 GB is more forgiving. Correctness thresholds use the
+challenge's own `atol` / `rtol`, matching the online judge.
 - This local judge covers correctness and timing for cuda/triton/pytorch. It does
-  **not** replicate the online platform's leaderboard or multi-GPU features — the
-  grading backend for those is not part of this repository (it is closed source, and
-  the content is licensed CC BY-NC-ND).
+**not** replicate the online platform's leaderboard or multi-GPU features — the
+grading backend for those is not part of this repository (it is closed source, and
+the content is licensed CC BY-NC-ND).
 
 ---
 
-<a name="本地判题中文"></a>
+
 
 ## 本地判题（中文）
 
@@ -125,11 +139,15 @@ are never committed by accident.
 
 ### 文件说明
 
-| 文件 | 作用 |
-| --- | --- |
-| `local_runner.py` | 判题器。加载 `challenge.py`，跑你的解法，与参考实现对拍并计时。 |
-| `judge.sh` | 启动脚本。自动激活 venv、把 `nvcc` 加进 `PATH`，再调用 `local_runner.py`。 |
-| `new_solution.sh` | 从 starter 模板为某题某语言初始化 `solution/` 文件。 |
+
+| 文件                | 作用                                                       |
+| ----------------- | -------------------------------------------------------- |
+| `local_runner.py` | 判题器。加载 `challenge.py`，跑你的解法，与参考实现对拍并计时。                  |
+| `judge.sh`        | 启动脚本。自动激活 venv、把 `nvcc` 加进 `PATH`，再调用 `local_runner.py`。 |
+| `new_solution.sh` | 从 starter 模板为某题某语言初始化 `solution/` 文件。                    |
+
+
+
 
 ### 一次性环境搭建
 
@@ -152,7 +170,11 @@ python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_
 # 预期输出: True (12, 0)
 ```
 
+
+
 ### 用法
+
+
 
 #### 方式一 —— 启动脚本（推荐，自动处理 venv 和 nvcc PATH）
 
@@ -170,6 +192,8 @@ scripts/new_solution.sh challenges/easy/1_vector_add triton
 # -> 生成 solution/solution.py；实现里面的 solve() 后用 judge.sh 判题
 ```
 
+
+
 #### 方式二 —— 直接调用 Python
 
 ```bash
@@ -183,11 +207,13 @@ python scripts/local_runner.py challenges/easy/1_vector_add --language cuda --ac
 
 ### 解法文件约定
 
-| 语言 | 路径 | 入口 |
-| --- | --- | --- |
-| cuda | `<题目>/solution/solution.cu` | `extern "C" void solve(...)` |
-| triton | `<题目>/solution/solution.py` | `def solve(...)` |
-| pytorch | `<题目>/solution/solution.pytorch.py` | `def solve(...)` |
+
+| 语言      | 路径                                  | 入口                           |
+| ------- | ----------------------------------- | ---------------------------- |
+| cuda    | `<题目>/solution/solution.cu`         | `extern "C" void solve(...)` |
+| triton  | `<题目>/solution/solution.py`         | `def solve(...)`             |
+| pytorch | `<题目>/solution/solution.pytorch.py` | `def solve(...)`             |
+
 
 也可以用 `--solution` 指定任意路径。`solution/` 已被 git 忽略，你的解法不会被误提交。
 
@@ -197,17 +223,22 @@ python scripts/local_runner.py challenges/easy/1_vector_add --language cuda --ac
 - `perf` —— 跑 `generate_performance_test()` 的大用例：先验证正确性，再计时（50 次迭代取平均）。
 - `all` —— 以上两者都跑。
 
+
+
 ### 原理
 
 - **pytorch / triton**：import 解法的 `solve()`，按 `get_solve_signature()` 的顺序
-  **位置传参**（Triton 的 `solve` 形参名常是小写，所以用位置而非关键字），再把输出张量
-  与 `reference_impl` 的结果对拍。
+**位置传参**（Triton 的 `solve` 形参名常是小写，所以用位置而非关键字），再把输出张量
+与 `reference_impl` 的结果对拍。
 - **cuda**：用 `nvcc -shared -Xcompiler -fPIC -arch=sm_120` 编成 `.so`，通过 `ctypes`
-  加载并调用 `solve`。张量按设备指针（`tensor.data_ptr()`）传入，标量按其声明的 `ctype` 传入。
+加载并调用 `solve`。张量按设备指针（`tensor.data_ptr()`）传入，标量按其声明的 `ctype` 传入。
+
+
 
 ### 注意
 
 - 每道题的 `generate_performance_test()` 规模是按线上 Tesla T4（16 GB）设计的；本机 24 GB
-  更宽松。判定阈值用题目自带的 `atol` / `rtol`，与线上一致。
+更宽松。判定阈值用题目自带的 `atol` / `rtol`，与线上一致。
 - 本地判题器覆盖了 cuda/triton/pytorch 的正确性与计时，但**不**复刻线上平台的排行榜、
-  多 GPU 等功能——那套评测后端不在本仓库里（闭源，且内容采用 CC BY-NC-ND 许可）。
+多 GPU 等功能——那套评测后端不在本仓库里（闭源，且内容采用 CC BY-NC-ND 许可）。
+
